@@ -14,12 +14,10 @@ class GenerateDraftsJob:
         self.author_repo = AuthorRepository()
         self.settings_repo = SettingsRepository()
         self.system_repo = SystemStatusRepository()
+
         self.claude = ClaudeService()
 
     def run(self):
-
-        self.system_repo.set_online()
-        self.system_repo.clear_error()
 
         posts = (
             self.content_repo.get_posts_by_status("Not started")
@@ -42,25 +40,51 @@ class GenerateDraftsJob:
                 "In progress"
             )
 
-            author = self.author_repo.get_author(
-                post.author_id
-            )
+            try:
 
-            draft = self.claude.generate_post(
-                post,
-                author,
-                settings
-            )
+                author = self.author_repo.get_author(
+                    post.author_id
+                )
 
-            self.content_repo.update_draft(
-                post.id,
-                draft
-            )
+                draft = self.claude.generate_post(
+                    post,
+                    author,
+                    settings
+                )
 
-            self.content_repo.mark_ready_for_review(
-                post.id
-            )
+                self.content_repo.update_draft(
+                    post.id,
+                    draft
+                )
 
-            self.system_repo.increment_posts_generated()
+                self.content_repo.mark_ready_for_review(
+                    post.id
+                )
 
-            print("Done.\n")
+                self.system_repo.increment_posts_generated()
+
+                self.system_repo.set_online()
+
+                self.system_repo.clear_error()
+
+                print("Done.\n")
+
+            except Exception as e:
+
+                error = str(e)
+
+                print(error)
+
+                self.content_repo.update_error(
+                    post.id,
+                    error
+                )
+
+                self.content_repo.update_status(
+                    post.id,
+                    "Ready for review"
+                )
+
+                self.system_repo.set_error(
+                    error
+                )
