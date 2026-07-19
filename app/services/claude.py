@@ -21,14 +21,14 @@ class ClaudeService:
     ) -> str:
 
         user_prompt = f"""
+Author Style Card:
+{author.style_card}
+
 Topic:
 {post.topic}
 
 Additional Information:
 {post.additional_information}
-
-Author Style Card:
-{author.style_card}
 """
 
         response = self.client.messages.create(
@@ -43,4 +43,15 @@ Author Style Card:
             ]
         )
 
-        return response.content[0].text.strip()
+        # Claude 5 may return ThinkingBlocks before TextBlocks.
+        # Extract only the text blocks.
+        output = []
+
+        for block in response.content:
+            if getattr(block, "type", None) == "text":
+                output.append(block.text)
+
+        if not output:
+            raise Exception("Claude returned no text.")
+
+        return "\n".join(output).strip()
