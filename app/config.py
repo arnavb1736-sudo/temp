@@ -19,6 +19,25 @@ class Config:
     AI_SETTINGS_DB_ID = os.getenv("NOTION_AI_SETTINGS_DB_ID")
     SYSTEM_STATUS_DB_ID = os.getenv("NOTION_SYSTEM_STATUS_DB_ID")
 
+    # Scheduler
+    DRAFT_CHECK_INTERVAL = int(
+        os.getenv("DRAFT_CHECK_INTERVAL", 1)
+    )
+
+    PUBLISH_CHECK_INTERVAL = int(
+        os.getenv("PUBLISH_CHECK_INTERVAL", 5)
+    )
+
+    ENABLE_AUTO_GENERATION = (
+        os.getenv("ENABLE_AUTO_GENERATION", "true").lower()
+        == "true"
+    )
+
+    ENABLE_AUTO_PUBLISH = (
+        os.getenv("ENABLE_AUTO_PUBLISH", "true").lower()
+        == "true"
+    )
+
     # Default publish time
     DEFAULT_PUBLISH_HOUR = 10
     DEFAULT_PUBLISH_MINUTE = 0
