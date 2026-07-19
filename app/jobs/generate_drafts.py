@@ -19,11 +19,15 @@ class GenerateDraftsJob:
 
     def run(self):
 
+        print("Checking Notion for posts...")
+
         posts = (
             self.content_repo.get_posts_by_status("Not started")
             +
             self.content_repo.get_regeneration_requests()
         )
+
+        print(f"Posts found: {len(posts)}")
 
         if not posts:
             print("No posts to generate.")
@@ -33,7 +37,10 @@ class GenerateDraftsJob:
 
         for post in posts:
 
-            print(f"Generating draft for: {post.topic}")
+            print("--------------------------------------")
+            print(f"Topic : {post.topic}")
+            print(f"Author: {post.author_id}")
+            print("--------------------------------------")
 
             self.content_repo.update_status(
                 post.id,
@@ -46,38 +53,41 @@ class GenerateDraftsJob:
                     post.author_id
                 )
 
+                print("Author loaded.")
+
                 draft = self.claude.generate_post(
                     post,
                     author,
                     settings
                 )
 
+                print("Claude generation successful.")
+
                 self.content_repo.update_draft(
                     post.id,
                     draft
                 )
+
+                print("Draft written to Notion.")
 
                 self.content_repo.mark_ready_for_review(
                     post.id
                 )
 
                 self.system_repo.increment_posts_generated()
-
                 self.system_repo.set_online()
-
                 self.system_repo.clear_error()
 
-                print("Done.\n")
+                print("Finished successfully.")
 
             except Exception as e:
 
-                error = str(e)
-
-                print(error)
+                print("ERROR")
+                print(e)
 
                 self.content_repo.update_error(
                     post.id,
-                    error
+                    str(e)
                 )
 
                 self.content_repo.update_status(
@@ -86,5 +96,5 @@ class GenerateDraftsJob:
                 )
 
                 self.system_repo.set_error(
-                    error
+                    str(e)
                 )

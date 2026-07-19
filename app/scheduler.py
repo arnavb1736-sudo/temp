@@ -1,4 +1,5 @@
 import threading
+from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -12,30 +13,40 @@ generate_lock = threading.Lock()
 publish_lock = threading.Lock()
 
 
+def log(message):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {message}")
+
+
 def generate_job():
 
+    log("Generate scheduler triggered.")
+
     if not generate_lock.acquire(blocking=False):
-        print("Generate job already running.")
+        log("Generate job already running.")
         return
 
     try:
         if Config.ENABLE_AUTO_GENERATION:
-            print("Running draft generation...")
             GenerateDraftsJob().run()
+    except Exception as e:
+        log(f"Generate job crashed: {e}")
     finally:
         generate_lock.release()
 
 
 def publish_job():
 
+    log("Publish scheduler triggered.")
+
     if not publish_lock.acquire(blocking=False):
-        print("Publish job already running.")
+        log("Publish job already running.")
         return
 
     try:
         if Config.ENABLE_AUTO_PUBLISH:
-            print("Running publish job...")
             PublishPostsJob().run()
+    except Exception as e:
+        log(f"Publish job crashed: {e}")
     finally:
         publish_lock.release()
 
@@ -44,7 +55,7 @@ def start_scheduler():
 
     scheduler.add_job(
         generate_job,
-        trigger="interval",
+        "interval",
         minutes=Config.DRAFT_CHECK_INTERVAL,
         id="generate_drafts",
         replace_existing=True,
@@ -54,7 +65,7 @@ def start_scheduler():
 
     scheduler.add_job(
         publish_job,
-        trigger="interval",
+        "interval",
         minutes=Config.PUBLISH_CHECK_INTERVAL,
         id="publish_posts",
         replace_existing=True,
@@ -64,10 +75,10 @@ def start_scheduler():
 
     scheduler.start()
 
-    print("=" * 50)
-    print("Elevastra Scheduler Started")
-    print(f"Draft interval   : {Config.DRAFT_CHECK_INTERVAL} minute(s)")
-    print(f"Publish interval : {Config.PUBLISH_CHECK_INTERVAL} minute(s)")
-    print(f"Auto Generate    : {Config.ENABLE_AUTO_GENERATION}")
-    print(f"Auto Publish     : {Config.ENABLE_AUTO_PUBLISH}")
-    print("=" * 50)
+    log("=" * 50)
+    log("Elevastra Scheduler Started")
+    log(f"Draft interval: {Config.DRAFT_CHECK_INTERVAL}")
+    log(f"Publish interval: {Config.PUBLISH_CHECK_INTERVAL}")
+    log(f"Auto Generate: {Config.ENABLE_AUTO_GENERATION}")
+    log(f"Auto Publish: {Config.ENABLE_AUTO_PUBLISH}")
+    log("=" * 50)
