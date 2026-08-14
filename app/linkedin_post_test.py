@@ -8,7 +8,7 @@ url = "https://api.linkedin.com/rest/posts"
 
 headers = {
     "Authorization": f"Bearer {ACCESS_TOKEN}",
-    "LinkedIn-Version": "202507",
+    "LinkedIn-Version": "202607",
     "X-Restli-Protocol-Version": "2.0.0",
     "Content-Type": "application/json",
 }
