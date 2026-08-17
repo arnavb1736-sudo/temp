@@ -46,3 +46,50 @@ class AuthorRepository:
             linkedin_access_token=linkedin_access_token,
             linkedin_refresh_token=linkedin_refresh_token,
         )
+
+    def update_linkedin_credentials(
+        self,
+        page_id: str,
+        access_token: str,
+        refresh_token: str,
+        person_id: str,
+    ):
+
+        notion.pages.update(
+            page_id=page_id,
+            properties={
+                "Linkedin Connected": {
+                    "checkbox": True
+                },
+                "Linkedin Person ID": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": person_id
+                            }
+                        }
+                    ]
+                },
+                "Linkedin Access Token": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": access_token
+                            }
+                        }
+                    ]
+                },
+                "Linkedin Refresh Token": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": refresh_token or ""
+                            }
+                        }
+                    ]
+                },
+            }
+        )
