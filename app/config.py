@@ -13,6 +13,11 @@ class Config:
     NOTION_API_KEY = os.getenv("NOTION_API_KEY")
     CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
+    # LinkedIn OAuth
+    LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID")
+    LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET")
+    LINKEDIN_REDIRECT_URI = os.getenv("LINKEDIN_REDIRECT_URI")
+
     # Notion Data Source IDs
     CONTENT_DB_ID = os.getenv("NOTION_CONTENT_DB_ID")
     AUTHOR_DB_ID = os.getenv("NOTION_AUTHOR_DB_ID")
