@@ -33,6 +33,18 @@ class ContentRepository:
 
         regenerate = properties["Regenerate Draft"]["checkbox"]
 
+        # Read optional image from the Notion Files & media property
+        image_url = None
+        image_property = properties.get("Image")
+
+        if image_property and image_property["files"]:
+            image_file = image_property["files"][0]
+
+            if image_file["type"] == "file":
+                image_url = image_file["file"]["url"]
+            elif image_file["type"] == "external":
+                image_url = image_file["external"]["url"]
+
         return Post(
             id=page["id"],
             topic=topic,
@@ -42,6 +54,7 @@ class ContentRepository:
             publish_date=publish_date,
             author_id=author_id,
             regenerate_draft=regenerate,
+            image_url=image_url,
         )
 
     def get_posts_by_status(self, status: str):
@@ -159,7 +172,7 @@ class ContentRepository:
         self.clear_error(page_id)
         self.clear_regenerate_checkbox(page_id)
         self.update_status(page_id, "Ready for review")
-    
+
     def mark_published(self, page_id: str):
         self.clear_error(page_id)
         self.update_status(page_id, "Published")
