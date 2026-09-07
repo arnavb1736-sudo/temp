@@ -38,7 +38,8 @@ class PublishPostsJob:
 
                 self.linkedin.publish_post(
                     author,
-                    post.draft
+                    post.draft,
+                    post.image_url
                 )
 
                 self.content_repo.mark_published(
