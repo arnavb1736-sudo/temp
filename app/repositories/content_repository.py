@@ -33,15 +33,14 @@ class ContentRepository:
 
         regenerate = properties["Regenerate Draft"]["checkbox"]
 
-        # Read optional image from the Notion Files & media property
         image_url = None
-        image_property = properties.get("Image")
 
-        if image_property and image_property["files"]:
-            image_file = image_property["files"][0]
+        if "Image" in properties and properties["Image"]["files"]:
+            image_file = properties["Image"]["files"][0]
 
             if image_file["type"] == "file":
                 image_url = image_file["file"]["url"]
+
             elif image_file["type"] == "external":
                 image_url = image_file["external"]["url"]
 
