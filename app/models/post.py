@@ -12,4 +12,4 @@ class Post:
     publish_date: datetime | None
     author_id: str
     regenerate_draft: bool
-    image_url: str | None
+    image_url: str | None = None
